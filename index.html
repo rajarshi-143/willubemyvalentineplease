@@ -250,7 +250,7 @@
         spawnHearts();
         document.body.classList.add('yes-bg', 'video-on');
 
-        // Auto-scroll visible cards (cancelable)
+        // Auto-scroll visible cards (cancelable on desktop & mobile)
         document.querySelectorAll('.card').forEach(card => {
           if (card.style.display !== 'none') autoScrollCard(card);
         });
@@ -271,11 +271,14 @@
       });
     }
 
-    // ===== Auto-scroll (cancelable) =====
+    // ===== Auto-scroll (mobile & desktop friendly, cancelable) =====
     function autoScrollCard(card, step = 1, interval = 20) {
       if (!card) return;
+      let stopped = false;
 
       const scrollInterval = setInterval(() => {
+        if (stopped) return clearInterval(scrollInterval);
+
         if (card.scrollTop + card.clientHeight < card.scrollHeight) {
           card.scrollTop += step;
         } else {
@@ -283,10 +286,12 @@
         }
       }, interval);
 
-      // Stop auto-scroll if user scrolls manually
-      const stopScroll = () => clearInterval(scrollInterval);
+      // Stop auto-scroll on any user interaction
+      const stopScroll = () => { stopped = true; };
       card.addEventListener('wheel', stopScroll, { once: true });
+      card.addEventListener('touchstart', stopScroll, { once: true });
       card.addEventListener('touchmove', stopScroll, { once: true });
+      card.addEventListener('scroll', stopScroll, { once: true });
     }
 
     // ===== Watch video toggle =====
