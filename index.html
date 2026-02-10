@@ -145,7 +145,6 @@
 </head>
 <body>
 
-  <!-- Background video -->
   <!-- Background music -->
   <audio id="bgMusic" loop>
     <source src="music.mp3" type="audio/mpeg" />
@@ -249,6 +248,11 @@
       yesBtn.addEventListener('click', () => {
         spawnHearts();
         document.body.classList.add('yes-bg', 'video-on');
+
+        // Auto-scroll visible cards
+        document.querySelectorAll('.card').forEach(card => {
+          if (card.style.display !== 'none') autoScrollCard(card);
+        });
       });
     }
 
@@ -267,20 +271,20 @@
     }
 
     // ===== Auto-scroll =====
-    function autoScrollCard(card) {
+    function autoScrollCard(card, speed = 20) {
       if (!card) return;
-      const interval = setInterval(() => {
-        if (card.scrollHeight <= card.clientHeight) return;
-        card.scrollTop += 1;
-        if (card.scrollTop + card.clientHeight >= card.scrollHeight) {
-          clearInterval(interval);
-        }
-      }, 20);
-    }
+      const scrollStep = 1;
 
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('mouseenter', () => autoScrollCard(card));
-    });
+      function step() {
+        // Scroll down only if not at bottom
+        if (card.scrollTop + card.clientHeight < card.scrollHeight) {
+          card.scrollTop += scrollStep;
+          requestAnimationFrame(step);
+        }
+      }
+
+      step();
+    }
 
     // ===== Watch video toggle =====
     const watchBtn = document.getElementById('watchVideo');
@@ -313,7 +317,3 @@
   </script>
 </body>
 </html>
-
-
-
-
